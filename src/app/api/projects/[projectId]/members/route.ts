@@ -9,6 +9,17 @@ import {
 import prisma from "../../../../../lib/db";
 import { resolveProjectId, type ProjectParams } from "../../../../../lib/params";
 
+const parseStandupSequence = (value: string): string[] => {
+  try {
+    const parsed = JSON.parse(value);
+    return Array.isArray(parsed)
+      ? parsed.filter((entry): entry is string => typeof entry === "string")
+      : [];
+  } catch {
+    return [];
+  }
+};
+
 export async function GET(
   request: NextRequest,
   ctx: { params: Promise<Awaited<ProjectParams>> }
@@ -58,6 +69,7 @@ export async function GET(
     select: {
       id: true,
       role: true,
+      createdAt: true,
       user: {
         select: {
           id: true,
@@ -211,4 +223,104 @@ export async function PATCH(
   });
 
   return NextResponse.json(updatedMembership);
+}
+
+export async function DELETE(
+  request: NextRequest,
+  ctx: { params: Promise<Awaited<ProjectParams>> }
+) {
+  const params = await ctx.params;
+  const projectId = await resolveProjectId(params);
+
+  if (!projectId) {
+    return NextResponse.json({ message: "projectId is required" }, { status: 400 });
+  }
+
+  const user = await getUserFromRequest(request);
+
+  if (!user) {
+    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+  }
+
+  try {
+    await requireProjectRole(user.id, projectId, [Role.ADMIN, Role.PO]);
+  } catch (error) {
+    if (error instanceof AuthorizationError) {
+      return NextResponse.json(
+        { message: error.message },
+        { status: error.status }
+      );
+    }
+
+    return NextResponse.json({ message: "Forbidden" }, { status: 403 });
+  }
+
+  const { userId } = await request.json().catch(() => ({}));
+
+  if (!userId) {
+    return NextResponse.json({ message: "userId is required" }, { status: 400 });
+  }
+
+  const membership = await prisma.projectMember.findUnique({
+    where: {
+      projectId_userId: { projectId, userId },
+    },
+  });
+
+  if (!membership) {
+    return NextResponse.json({ message: "Member not found" }, { status: 404 });
+  }
+
+  const memberCount = await prisma.projectMember.count({ where: { projectId } });
+
+  if (memberCount <= 1) {
+    return NextResponse.json(
+      { message: "A project must keep at least one member." },
+      { status: 400 }
+    );
+  }
+
+  const adminCount = await prisma.projectMember.count({
+    where: {
+      projectId,
+      role: { in: [Role.ADMIN, Role.PO] },
+    },
+  });
+
+  if (
+    (membership.role === Role.ADMIN || membership.role === Role.PO) &&
+    adminCount <= 1
+  ) {
+    return NextResponse.json(
+      { message: "A project must keep at least one Admin or Product Owner." },
+      { status: 400 }
+    );
+  }
+
+  await prisma.$transaction(async (tx) => {
+    await tx.projectMember.delete({
+      where: {
+        projectId_userId: { projectId, userId },
+      },
+    });
+
+    const settings = await tx.projectSettings.findUnique({
+      where: { projectId },
+      select: { standupSequence: true },
+    });
+
+    if (settings?.standupSequence) {
+      const currentSequence = parseStandupSequence(settings.standupSequence);
+      const nextSequence = currentSequence.filter((entry) => entry !== userId);
+
+      if (nextSequence.length !== currentSequence.length) {
+        await tx.projectSettings.update({
+          where: { projectId },
+          data: { standupSequence: JSON.stringify(nextSequence) },
+        });
+      }
+    }
+  });
+
+  return NextResponse.json({ message: "Member removed." });
 }
