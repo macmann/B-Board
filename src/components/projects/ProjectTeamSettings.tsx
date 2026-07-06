@@ -61,7 +61,7 @@ export default function ProjectTeamSettings({
   const [actionError, setActionError] = useState<string | null>(null);
   const [pendingActionId, setPendingActionId] = useState<string | null>(null);
   const [pendingActionType, setPendingActionType] = useState<
-    "resend" | "delete" | "update-role" | null
+    "resend" | "delete" | "update-role" | "remove-member" | null
   >(null);
   const [roleEdits, setRoleEdits] = useState<Record<string, Role>>({});
 
@@ -289,6 +289,51 @@ export default function ProjectTeamSettings({
     }
   };
 
+  const handleRemoveMember = async (member: Member) => {
+    if (!allowInvites) return;
+
+    const memberName = member.user.name || member.user.email || "this member";
+    const confirmed = window.confirm(
+      `Remove ${memberName} from this project? They will no longer appear in the standup queue or access this project.`
+    );
+
+    if (!confirmed) return;
+
+    setActionStatus(null);
+    setActionError(null);
+    setPendingActionId(member.id);
+    setPendingActionType("remove-member");
+
+    try {
+      const response = await fetch(`/api/projects/${projectId}/members`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: member.user.id }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => null);
+        throw new Error(data?.message ?? "Unable to remove member.");
+      }
+
+      setMembers((prev) => prev.filter((item) => item.id !== member.id));
+      setRoleEdits((prev) => {
+        const next = { ...prev };
+        delete next[member.id];
+        return next;
+      });
+      setActionStatus("Member removed from the project.");
+      await fetchTeamData();
+    } catch (err) {
+      setActionError(
+        err instanceof Error ? err.message : "Failed to remove the member."
+      );
+    } finally {
+      setPendingActionId(null);
+      setPendingActionType(null);
+    }
+  };
+
   const handleUpdateMemberRole = async (member: Member) => {
     if (!allowInvites) return;
 
@@ -456,6 +501,18 @@ export default function ProjectTeamSettings({
                           pendingActionType === "update-role"
                             ? "Updating..."
                             : "Update"}
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          className="px-2 py-1 text-xs text-rose-600 hover:text-rose-700"
+                          disabled={pendingActionId === member.id}
+                          onClick={() => handleRemoveMember(member)}
+                        >
+                          {pendingActionId === member.id &&
+                          pendingActionType === "remove-member"
+                            ? "Removing..."
+                            : "Remove"}
                         </Button>
                       </div>
                     ) : (
