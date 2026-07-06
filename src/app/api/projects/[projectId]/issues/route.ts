@@ -22,6 +22,7 @@ import { getNextIssuePosition } from "../../../../../lib/issuePosition";
 import { resolveProjectId, type ProjectParams } from "../../../../../lib/params";
 import { logError } from "../../../../../lib/logger";
 import { sendAssigneeNotification } from "../../../../../lib/issueNotifications";
+import { getNextIssueKey, isUniqueIssueKeyConflict } from "../../../../../lib/issueKey";
 
 const fetchSecondaryAssignee = async (secondaryAssigneeId: string | null) => {
   if (!secondaryAssigneeId) {
@@ -128,15 +129,6 @@ export async function POST(
       );
     }
 
-    const projectInitial = (() => {
-      const words = project.name.trim().split(" ");
-      if (words.length === 1) return words[0][0].toUpperCase();
-      return (words[0][0] + words[1][0]).toUpperCase();
-    })();
-
-    const count = await prisma.issue.count({ where: { projectId } });
-    const key = `${projectInitial}-${count + 1}`;
-
     if (assigneeId) {
       const assigneeMembership = await prisma.projectMember.findUnique({
         where: { projectId_userId: { projectId, userId: assigneeId } },
@@ -159,28 +151,49 @@ export async function POST(
       }
     }
 
-    const issue = await prisma.issue.create({
-      data: {
-        projectId,
-        key,
-        title,
-        type: validatedType,
-        priority: validatedPriority,
-        storyPoints: parsedStoryPoints,
-        assigneeId: assigneeId ?? null,
-        secondaryAssigneeId: secondaryAssigneeId ?? null,
-        epicId: epicId ?? null,
-        description: description ?? null,
-        status: issueStatus,
-        sprintId: sprintIdValue,
-        ...(issuePosition !== null ? { position: issuePosition } : {}),
-        reporterId: user.id,
-      },
-      include: {
-        epic: true,
-        assignee: true,
-      },
-    });
+    const createIssue = async () => {
+      const key = await getNextIssueKey(prisma, projectId, project.name);
+
+      return prisma.issue.create({
+        data: {
+          projectId,
+          key,
+          title,
+          type: validatedType,
+          priority: validatedPriority,
+          storyPoints: parsedStoryPoints,
+          assigneeId: assigneeId ?? null,
+          secondaryAssigneeId: secondaryAssigneeId ?? null,
+          epicId: epicId ?? null,
+          description: description ?? null,
+          status: issueStatus,
+          sprintId: sprintIdValue,
+          ...(issuePosition !== null ? { position: issuePosition } : {}),
+          reporterId: user.id,
+        },
+        include: {
+          epic: true,
+          assignee: true,
+        },
+      });
+    };
+
+    let issue: Awaited<ReturnType<typeof createIssue>> | null = null;
+
+    for (let attempt = 0; attempt < 5; attempt += 1) {
+      try {
+        issue = await createIssue();
+        break;
+      } catch (error) {
+        if (!isUniqueIssueKeyConflict(error) || attempt === 4) {
+          throw error;
+        }
+      }
+    }
+
+    if (!issue) {
+      return jsonError("Failed to create issue", 500);
+    }
 
     const secondaryAssignee = await fetchSecondaryAssignee(issue.secondaryAssigneeId);
 
