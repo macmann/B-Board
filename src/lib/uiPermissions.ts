@@ -10,6 +10,10 @@ export const canManageSprints = (role: ProjectRole | null | undefined): boolean 
   return role === "ADMIN" || role === "PO";
 };
 
+export const canDeleteSprints = (role: ProjectRole | null | undefined): boolean => {
+  return role === "ADMIN";
+};
+
 export const canInviteMembers = (role: ProjectRole | null | undefined): boolean => {
   return role === "ADMIN" || role === "PO";
 };

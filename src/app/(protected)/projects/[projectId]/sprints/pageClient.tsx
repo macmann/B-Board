@@ -14,7 +14,7 @@ import {
 } from "../../../../../lib/prismaEnums";
 
 import { ProjectRole } from "../../../../../lib/roles";
-import { canManageSprints } from "../../../../../lib/uiPermissions";
+import { canDeleteSprints, canManageSprints } from "../../../../../lib/uiPermissions";
 
 type Sprint = {
   id: string;
@@ -60,8 +60,16 @@ export default function ProjectSprintsPageClient({
   const [summaryError, setSummaryError] = useState("");
   const [summaryLoading, setSummaryLoading] = useState(false);
   const [selectedSprintId, setSelectedSprintId] = useState<string | null>(null);
+  const [editingSprint, setEditingSprint] = useState<Sprint | null>(null);
+  const [editName, setEditName] = useState("");
+  const [editGoal, setEditGoal] = useState("");
+  const [editStartDate, setEditStartDate] = useState("");
+  const [editEndDate, setEditEndDate] = useState("");
+  const [editLoading, setEditLoading] = useState(false);
+  const [deleteLoadingId, setDeleteLoadingId] = useState<string | null>(null);
 
   const allowSprintManagement = canManageSprints(projectRole);
+  const allowSprintDeletion = canDeleteSprints(projectRole);
 
   const statusStyles = useMemo(
     () => ({
@@ -196,6 +204,77 @@ export default function ProjectSprintsPageClient({
     }
 
     await fetchSprints();
+  };
+
+  const handleEditSprint = (sprint: Sprint) => {
+    setError("");
+    setEditingSprint(sprint);
+    setEditName(sprint.name);
+    setEditGoal(sprint.goal ?? "");
+    setEditStartDate(sprint.startDate?.slice(0, 10) ?? "");
+    setEditEndDate(sprint.endDate?.slice(0, 10) ?? "");
+  };
+
+  const handleUpdateSprint = async () => {
+    if (!editingSprint) return;
+
+    setEditLoading(true);
+    setError("");
+
+    try {
+      const response = await fetch(`/api/sprints/${editingSprint.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: editName,
+          goal: editGoal || undefined,
+          startDate: editStartDate || undefined,
+          endDate: editEndDate || undefined,
+        }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => null);
+        setError(data?.message ?? "Unable to update sprint.");
+        return;
+      }
+
+      setEditingSprint(null);
+      await fetchSprints();
+      router.refresh();
+    } catch (err) {
+      setError("An unexpected error occurred while updating the sprint.");
+    } finally {
+      setEditLoading(false);
+    }
+  };
+
+  const handleDeleteSprint = async (sprint: Sprint) => {
+    if (!window.confirm(`Delete ${sprint.name}? Issues and test executions will be unassigned from this sprint.`)) {
+      return;
+    }
+
+    setDeleteLoadingId(sprint.id);
+    setError("");
+
+    try {
+      const response = await fetch(`/api/sprints/${sprint.id}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => null);
+        setError(data?.message ?? "Unable to delete sprint.");
+        return;
+      }
+
+      await fetchSprints();
+      router.refresh();
+    } catch (err) {
+      setError("An unexpected error occurred while deleting the sprint.");
+    } finally {
+      setDeleteLoadingId(null);
+    }
   };
 
   const handleCompleteSprint = async (sprintId: string) => {
@@ -438,6 +517,78 @@ export default function ProjectSprintsPageClient({
         </div>
       )}
 
+      {editingSprint && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 px-4">
+          <div className="w-full max-w-lg rounded-xl bg-white p-6 shadow-xl">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <h3 className="text-lg font-semibold text-slate-900">Edit sprint</h3>
+                <p className="text-sm text-slate-600">Update sprint details after creation.</p>
+              </div>
+              <button
+                className="text-slate-400 hover:text-slate-600"
+                onClick={() => setEditingSprint(null)}
+                type="button"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="mt-5 space-y-4">
+              <div className="space-y-1">
+                <label className="block text-sm font-medium text-slate-700">Sprint name</label>
+                <input
+                  value={editName}
+                  onChange={(event) => setEditName(event.target.value)}
+                  className="block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="block text-sm font-medium text-slate-700">Goal (optional)</label>
+                <textarea
+                  rows={3}
+                  value={editGoal}
+                  onChange={(event) => setEditGoal(event.target.value)}
+                  className="block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div className="space-y-1">
+                  <label className="block text-sm font-medium text-slate-700">Start date</label>
+                  <input
+                    type="date"
+                    value={editStartDate}
+                    onChange={(event) => setEditStartDate(event.target.value)}
+                    className="block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="block text-sm font-medium text-slate-700">End date</label>
+                  <input
+                    type="date"
+                    value={editEndDate}
+                    onChange={(event) => setEditEndDate(event.target.value)}
+                    className="block w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-6 flex justify-end gap-2 border-t border-slate-200 pt-4">
+              <Button type="button" variant="secondary" onClick={() => setEditingSprint(null)}>
+                Cancel
+              </Button>
+              <Button type="button" disabled={editLoading} onClick={handleUpdateSprint}>
+                {editLoading ? "Saving..." : "Save changes"}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {error && !isLoading && (
         <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-700">
           {error}
@@ -502,6 +653,31 @@ export default function ProjectSprintsPageClient({
                         }}
                       >
                         Start
+                      </Button>
+                    )}
+                    {allowSprintManagement && (
+                      <Button
+                        variant="secondary"
+                        className="px-3 py-1 text-xs"
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          handleEditSprint(sprint);
+                        }}
+                      >
+                        Edit
+                      </Button>
+                    )}
+                    {allowSprintDeletion && (
+                      <Button
+                        variant="secondary"
+                        className="px-3 py-1 text-xs text-red-600 hover:text-red-700"
+                        disabled={deleteLoadingId === sprint.id}
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          handleDeleteSprint(sprint);
+                        }}
+                      >
+                        {deleteLoadingId === sprint.id ? "Deleting..." : "Delete"}
                       </Button>
                     )}
                     {allowSprintManagement && sprint.status === SprintStatus.ACTIVE && (
