@@ -6,6 +6,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { getUserFromRequest } from "../../../../../lib/auth";
 import prisma from "../../../../../lib/db";
+import { getNextIssueKey } from "../../../../../lib/issueKey";
 
 function mapIssueType(value?: string | null): IssueType {
   const normalized = value?.trim().toLowerCase();
@@ -96,17 +97,6 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const projectInitial = (() => {
-    const words = project.name.trim().split(" ");
-
-    if (words.length === 1) return words[0][0].toUpperCase();
-
-    return (words[0][0] + words[1][0]).toUpperCase();
-  })();
-
-  const startingIssueCount = await prisma.issue.count({ where: { projectId } });
-  let nextIssueNumber = startingIssueCount + 1;
-
   const buffer = Buffer.from(await file.arrayBuffer());
   const csvContent = buffer.toString("utf-8");
 
@@ -139,7 +129,7 @@ export async function POST(request: NextRequest) {
     const assigneeEmail = row["AssigneeEmail"] ?? row["Assignee"] ?? row["assigneeEmail"];
     const epicKey = row["EpicKey"] ?? row["Epic Key"] ?? row["epicKey"];
     const jiraIssueKey = row["IssueKey"] ?? row["Issue Key"] ?? row["issueKey"];
-    const issueKey = jiraIssueKey ?? `${projectInitial}-${nextIssueNumber++}`;
+    const issueKey = jiraIssueKey ?? (await getNextIssueKey(prisma, projectId, project.name));
 
     if (!summary) {
       errors.push(`Row ${rowNumber}: Summary is required.`);

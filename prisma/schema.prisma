@@ -396,6 +396,7 @@ model Issue {
   testCases     TestCase[]              @relation("StoryTestCases")
   bugExecutions TestExecution[]         @relation("BugTestExecutions")
 
+  @@unique([projectId, key])
   @@index([projectId])
   @@index([sprintId])
   @@index([epicId])
