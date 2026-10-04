@@ -5,7 +5,7 @@ import AppThemeProvider from "@/components/theme/ThemeProvider";
 
 export const metadata: Metadata = {
   title: "B Board",
-  description: "Lightweight agile board and backlog manager.",
+  description: "AI-assisted delivery workspace for product, engineering, and QA teams.",
   icons: {
     icon: "/logo.svg",
     shortcut: "/logo.svg",

@@ -3,7 +3,7 @@ import { Card } from "@/components/ui/Card";
 const faqs = [
   {
     question: "Is it a Jira replacement?",
-    answer: "B Board focuses on sprint execution and reporting without the overhead of traditional enterprise trackers.",
+    answer: "B Board can run the connected delivery workflow itself, including Jira CSV import. It currently does not provide live Jira, GitHub, Linear, or Slack synchronization.",
   },
   {
     question: "Do you support Scrum/Kanban?",
@@ -11,19 +11,19 @@ const faqs = [
   },
   {
     question: "How does standup work?",
-    answer: "Use the Daily Standup module to post your update, view the team dashboard, and keep everyone aligned.",
+    answer: "Contributors submit structured updates and link delivery work. Admins and POs can review attendance, evidence, blockers, actions, questions, and a copyable stakeholder digest.",
   },
   {
-    question: "Do you have AI summary?",
-    answer: "Each standup generates an AI summary and presents it as formatted Markdown for quick review.",
+    question: "What happens if AI is unavailable?",
+    answer: "Team standup summaries use the last good version or a non-LLM fallback. Sprint health and proactive guidance are deterministic and continue to work without an AI provider.",
   },
   {
-    question: "Where is data stored?",
-    answer: "Your data lives in our database with access controls designed for collaborative teams.",
+    question: "Does AI change work automatically?",
+    answer: "No. Personal drafts are editable, backlog fields are selectively applied, and suggestions can be accepted, rejected, snoozed, or dismissed. People remain in control.",
   },
   {
-    question: "How do I request features?",
-    answer: "Reach out through the Contact Us form and include the use case you want to solve.",
+    question: "Where can I find documentation?",
+    answer: "The public Resources page links to the setup README, full feature catalog, detailed user guide, release QA checklist, source code, and community channels.",
   },
 ];
 
