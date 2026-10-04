@@ -1,8 +1,8 @@
-import Logo from "@/components/branding/Logo";
 import { ContactUsSection } from "@/components/marketing/ContactUsSection";
 import { FAQSection } from "@/components/marketing/FAQSection";
 import { FeaturesSection } from "@/components/marketing/FeaturesSection";
 import { ProductShowcaseSection } from "@/components/marketing/ProductShowcaseSection";
+import { MarketingFooter, MarketingHeader } from "@/components/marketing/MarketingShell";
 import { homepageEnabled } from "@/config/appConfig";
 import { redirect } from "next/navigation";
 import Image from "next/image";
@@ -25,25 +25,9 @@ export default function HomePage() {
 
   return (
     <main className="min-h-screen overflow-hidden bg-[#f8fafc] text-slate-950">
-      <header className="fixed inset-x-0 top-0 z-50 border-b border-slate-200/80 bg-white/90 backdrop-blur-xl">
-        <div className="mx-auto flex h-18 max-w-7xl items-center justify-between px-5 py-3 sm:px-8">
-          <a href="#top" aria-label="B Board home">
-            <Logo subtitle="Agile delivery, connected" />
-          </a>
-          <nav className="hidden items-center gap-7 text-sm font-semibold text-slate-600 md:flex" aria-label="Main navigation">
-            <a className="transition hover:text-blue-600" href="#features">Features</a>
-            <a className="transition hover:text-blue-600" href="#screenshots">Product</a>
-            <a className="transition hover:text-blue-600" href="#workflow">How it works</a>
-            <a className="transition hover:text-blue-600" href="#faq">FAQ</a>
-          </nav>
-          <div className="flex items-center gap-3">
-            <a href="/login" className="hidden text-sm font-bold text-slate-700 transition hover:text-blue-600 sm:block">Sign in</a>
-            <a href="/register" className="rounded-full bg-blue-600 px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-blue-600/20 transition hover:bg-blue-700">Get started</a>
-          </div>
-        </div>
-      </header>
+      <MarketingHeader />
 
-      <section id="top" className="relative pt-36 sm:pt-44">
+      <section id="top" className="relative pt-24 sm:pt-32">
         <div className="absolute inset-x-0 top-0 -z-10 h-[760px] bg-[radial-gradient(circle_at_78%_24%,rgba(37,99,235,.16),transparent_30%),radial-gradient(circle_at_18%_10%,rgba(99,102,241,.12),transparent_28%)]" />
         <div className="mx-auto grid max-w-7xl items-center gap-14 px-5 sm:px-8 lg:grid-cols-[0.86fr_1.14fr]">
           <div>
@@ -59,10 +43,10 @@ export default function HomePage() {
               spend less time coordinating and more time building.
             </p>
             <div className="mt-9 flex flex-wrap gap-3">
-              <a href="/register" className="rounded-full bg-blue-600 px-6 py-3.5 text-sm font-bold text-white shadow-xl shadow-blue-600/20 transition hover:-translate-y-0.5 hover:bg-blue-700">Start your workspace</a>
+              <a href="#contact" className="rounded-full bg-blue-600 px-6 py-3.5 text-sm font-bold text-white shadow-xl shadow-blue-600/20 transition hover:-translate-y-0.5 hover:bg-blue-700">Talk to our team</a>
               <a href="#screenshots" className="rounded-full border border-slate-300 bg-white px-6 py-3.5 text-sm font-bold text-slate-800 shadow-sm transition hover:border-slate-400">See the product <span aria-hidden>↓</span></a>
             </div>
-            <p className="mt-4 text-xs font-medium text-slate-500">Free and open source · Set up in minutes</p>
+            <p className="mt-4 text-xs font-medium text-slate-500">Open source · Human-controlled AI · Built for cross-functional teams</p>
           </div>
 
           <div className="relative">
@@ -89,7 +73,8 @@ export default function HomePage() {
         </section>
 
         <FeaturesSection />
-        <ProductShowcaseSection />
+        <div className="-mt-12 mb-12 text-center"><a href="/features" className="text-sm font-bold text-blue-600 hover:text-blue-700">Explore the complete feature map →</a></div>
+        <div id="product" className="scroll-mt-24"><ProductShowcaseSection /></div>
 
         <section id="workflow" className="scroll-mt-24 py-24">
           <div className="overflow-hidden rounded-[2rem] bg-slate-950 px-6 py-14 text-white sm:px-12 lg:px-16 lg:py-20">
@@ -98,7 +83,7 @@ export default function HomePage() {
                 <p className="text-xs font-bold uppercase tracking-[0.24em] text-blue-400">One connected loop</p>
                 <h2 className="mt-4 text-3xl font-bold tracking-tight sm:text-5xl">Your delivery rhythm, without the busywork.</h2>
                 <p className="mt-5 leading-7 text-slate-400">B Board keeps context moving with the work—from discovery through release and learning.</p>
-                <a href="/register" className="mt-8 inline-flex rounded-full bg-white px-5 py-3 text-sm font-bold text-slate-950 transition hover:bg-blue-50">Build your first project</a>
+                <a href="/user-guide" className="mt-8 inline-flex rounded-full bg-white px-5 py-3 text-sm font-bold text-slate-950 transition hover:bg-blue-50">Follow the user guide</a>
               </div>
               <ol className="grid gap-px overflow-hidden rounded-2xl border border-slate-800 bg-slate-800 sm:grid-cols-2">
                 {workflow.map(([number, title, body]) => (
@@ -120,18 +105,15 @@ export default function HomePage() {
           <h2 className="mx-auto mt-4 max-w-3xl text-3xl font-bold tracking-tight sm:text-5xl">Give your team one clear place to deliver.</h2>
           <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-blue-100">Start with a project, invite your team, and turn your next sprint into a shared, measurable plan.</p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
-            <a href="/register" className="rounded-full bg-white px-6 py-3.5 text-sm font-bold text-blue-700 transition hover:bg-blue-50">Get started free</a>
+            <a href="/user-guide" className="rounded-full bg-white px-6 py-3.5 text-sm font-bold text-blue-700 transition hover:bg-blue-50">See how teams work</a>
             <a href="#contact" className="rounded-full border border-white/30 px-6 py-3.5 text-sm font-bold text-white transition hover:bg-white/10">Talk to us</a>
           </div>
         </section>
 
         <ContactUsSection />
 
-        <footer className="mt-20 flex flex-col gap-5 border-t border-slate-200 py-8 text-sm text-slate-500 sm:flex-row sm:items-center sm:justify-between">
-          <Logo subtitle="Plan less. Ship with clarity." />
-          <div className="flex flex-wrap gap-5"><a href="#features">Features</a><a href="#screenshots">Product</a><a href="https://github.com/macmann/b-board">GitHub</a><span>© {new Date().getFullYear()} B Board</span></div>
-        </footer>
       </div>
+      <MarketingFooter />
     </main>
   );
 }
