@@ -1,286 +1,232 @@
 # B-Board
 
-<a href="https://imgbb.com/"><img src="https://i.ibb.co/SXpsspxS/logo.jpg" alt="B-Board logo" border="0"></a>
+![B-Board](public/logo.svg)
 
 [![Website](https://img.shields.io/badge/Website-www.bboard.site-0ea5e9?style=for-the-badge&logo=googlechrome&logoColor=white)](https://www.bboard.site)
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-B--Board-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/company/bboardx)
 
-B-Board is a full-stack agile delivery workspace built with Next.js, React, Prisma, and PostgreSQL. It combines sprint planning, issue workflows, standups, QA coverage, release build tracking, and reporting into a single application for product and engineering teams.
+**B-Board is an AI-assisted delivery workspace that helps product, engineering, and QA teams spend less time coordinating work and more time completing it.** It brings backlog refinement, sprint execution, standups, quality, releases, alerts, and delivery reporting into one Next.js application.
 
-## Table of Contents
+> New here? Use the [User Guide](USER_GUIDE.md) for task-by-task instructions. For a complete capability and access matrix, see the [Feature List](FEATURES.md).
 
-- [What B-Board Solves](#what-b-board-solves)
-- [Latest Feature Highlights](#latest-feature-highlights)
-- [Core Features](#core-features)
-- [Technology Stack](#technology-stack)
-- [Project Structure](#project-structure)
-- [Prerequisites](#prerequisites)
-- [Local Development Setup](#local-development-setup)
-- [Environment Variables](#environment-variables)
-- [Database & Data Management](#database--data-management)
-- [Running, Building, and Testing](#running-building-and-testing)
-- [Deployment Guide](#deployment-guide)
-  - [Option A: Render (recommended)](#option-a-render-recommended)
-  - [Option B: Any Node host (manual)](#option-b-any-node-host-manual)
-  - [Option C: Docker-style deployment notes](#option-c-docker-style-deployment-notes)
-- [Post-Deployment Validation Checklist](#post-deployment-validation-checklist)
-- [Troubleshooting](#troubleshooting)
+## Why B-Board
 
-## What B-Board Solves
+Delivery signals are usually scattered across tickets, standup notes, QA tools, and status meetings. B-Board connects those signals and uses AI where it can remove repetitive work:
 
-B-Board gives software teams one place to:
+- **Refine work faster:** scan a backlog for incomplete stories and generate structured user-story drafts.
+- **Shorten standups:** turn conversational answers into an editable update, then synthesize team submissions into a concise digest.
+- **Act earlier:** expose blockers, assignment gaps, open questions, health trends, and recommended interventions before a sprint slips.
+- **Keep people in control:** AI output is a draft. Users review, accept, selectively apply, snooze, dismiss, or reject suggestions.
+- **Preserve accountability:** AI runs, settings changes, suggestion decisions, and issue changes have auditable records.
 
-- manage backlog and sprint execution,
-- collaborate during standups and grooming,
-- connect QA activity with delivery,
-- track release readiness through build records, and
-- review delivery performance through dashboards and trends.
+## AI-powered efficiency at a glance
 
-## Latest Feature Highlights
+| Workflow | What B-Board does | Efficiency gain | Human control |
+| --- | --- | --- | --- |
+| Backlog grooming | Scans up to 30 backlog items per run and groups completeness suggestions by issue | Finds refinement gaps without reviewing every ticket manually | Open the issue to preview, accept, reject, or snooze each suggestion |
+| User-story drafting | Produces a structured story, description, acceptance criteria, assumptions, questions, and out-of-scope notes | Converts a thin ticket into a review-ready draft | Select which title, description, or criteria fields to apply |
+| Personal standup drafting | Asks about yesterday, today, and blockers, then fills the standup form | Reduces formatting and rewriting time | Review and edit the form before saving |
+| Team standup intelligence | Summarizes updates into progress, achievements, blockers, dependencies, gaps, actions, and questions | Replaces manual rollups and creates ready-to-share digests | Admins/POs review evidence, resolve actions, answer questions, and copy a digest |
+| Sprint health and guidance | Calculates health, forecast confidence, spillover risk, capacity signals, and deterministic interventions | Focuses leaders on the highest-value action for the day | Guidance can be enabled per project; suggestions can be accepted, snoozed, or dismissed |
+| Execution coordination | Turns persistent blockers and coordination events into targeted alerts and nudges | Reduces manual chasing and makes ownership explicit | Each user controls notification preferences and resolves alert state |
 
-### Proactive Sprint Guidance & Forecasting (newest)
+The sprint-health model and proactive guidance are **data-driven deterministic intelligence**, not free-form LLM output. This makes recommendations explainable and usable even when an AI provider is unavailable. Generative backlog and standup features require the API keys described below.
 
-B-Board now includes a richer **Sprint Health + Guidance** experience in reporting:
+## Product capabilities
 
-- **Sprint health scoring and risk forecasting** to make delivery risk visible before sprint close.
-- **Predictive delivery and capacity modeling** based on recent execution signals.
-- **Proactive guidance suggestions** with recommendation categories and confidence to support intervention planning.
-- **Capacity balancing signals** to identify overloaded and idle contributors early.
+- Prioritized product and research backlogs, epics, filters, inline editing, bulk actions, and Jira CSV import.
+- Sprint creation, scope planning, capacity signals, start/complete workflows, increments, and carry-over handling.
+- Drag-and-drop Kanban execution with ownership, secondary assignees, comments, attachments, and issue history.
+- Structured standups with linked issues/research, attendance, facilitator notes, clarifications, action states, and stakeholder digests.
+- QA Sprint 360 with reusable test cases, executions, story traceability, defects, and sprint coverage.
+- Release builds by environment/status, planned and deployed dates, linked issues, and release safeguards.
+- Project and portfolio reports for velocity, burndown, cycle time, blocker themes, aging, orphaned work, adoption, delivery health, and cross-project status.
+- Role-based project access, invitations, audit logs, configurable email, notifications, responsive layouts, and light/dark themes.
 
-### Release Builds Management
+See [FEATURES.md](FEATURES.md) for details, maturity notes, role access, and efficiency outcomes.
 
-Release Builds Management remains available and includes:
+## Technology
 
-- Build records by project/environment/status with planned and deployed timestamps.
-- Linked issues for auditable release content.
-- Per-project build key uniqueness and destructive-action guardrails.
-- Sprint-aware build visibility for builds touching sprint issues.
-- Role-aware management access for admins/PMs with read-focused contributor/viewer experience.
+- **Application:** Next.js 16, React 19, TypeScript, Tailwind CSS, Radix UI
+- **Server:** Next.js App Router/API routes plus one Pages API route for standup drafting
+- **Data:** PostgreSQL, Prisma ORM
+- **Authentication:** signed JWT stored in an HTTP-only cookie
+- **AI:** OpenAI SDK; OpenAI for standups and OpenAI-compatible endpoints for backlog workflows
+- **Analytics:** Recharts
+- **Quality:** Vitest, Testing Library, ESLint, TypeScript
 
-For QA validation scenarios, see `QA_CHECKLIST.md`.
-
-## Core Features
-
-- **Backlog, sprint, and board workflows** with drag-and-drop prioritization.
-- **Standups and summaries** with blockers and progress capture.
-- **AI-assisted workflows** for standup drafting and backlog grooming (optional via API keys).
-- **QA toolkit** and sprint-aware quality visibility.
-- **Release build tracking** with issue linkage and environment status.
-- **Reporting suite** for velocity, cycle/delivery insights, sprint health scoring, risk forecasting, proactive guidance, blocker trends, and adoption.
-- **Research backlog** for discovery and decision tracking.
-- **Team and role management** with access controls and audit-friendly behavior.
-- **Email automation** for invites, standup summaries, and contact workflows.
-- **Light/dark theming** and keyboard-friendly interactions.
-
-## Technology Stack
-
-- **Frontend**: Next.js 16, React 19, Tailwind CSS, Radix UI.
-- **Backend**: Next.js API routes, Prisma ORM, JWT auth.
-- **Database**: PostgreSQL.
-- **AI/LLM integrations (optional)**: OpenAI-compatible APIs.
-- **Charts and analytics**: Recharts.
-- **Testing**: Vitest + Testing Library.
-
-## Project Structure
+## Repository map
 
 ```text
 .
-├─ src/                     # App routes, API handlers, UI components, domain logic
-├─ prisma/
-│  ├─ schema.prisma         # Data model
-│  ├─ seed.ts               # Main seed data
-│  └─ seedBuilds.ts         # Optional release build seed data
-├─ scripts/
-│  ├─ render-deploy.mjs     # Render deployment helper
-│  ├─ check-placeholders.mjs
-│  └─ dedupe-testexecutions.mjs
-├─ render.yaml              # Render service blueprint
-├─ QA_CHECKLIST.md          # QA flows, especially build management checks
-└─ README.md
+├── src/app/                 # Pages, protected workspace, and App Router APIs
+├── src/pages/api/           # AI standup draft endpoint
+├── src/components/          # Product UI grouped by domain
+├── src/lib/                 # Auth, AI, reporting, coordination, and domain logic
+├── prisma/
+│   ├── schema.prisma        # PostgreSQL data model
+│   ├── migrations/          # Versioned schema changes
+│   ├── seed.ts              # Baseline demo data
+│   └── seedBuilds.ts        # Release-build QA data
+├── public/                  # Logo and product illustrations
+├── scripts/                 # Deploy and maintenance utilities
+├── USER_GUIDE.md            # End-user and administrator workflows
+├── FEATURES.md              # Comprehensive product capability catalog
+├── QA_CHECKLIST.md          # Release-build regression checklist
+└── render.yaml              # Render blueprint
 ```
 
-## Prerequisites
+## Quick start
 
-- **Node.js**: 18+
-- **npm**: version bundled with your Node install
-- **PostgreSQL**: local or managed
-- **Optional**: OpenAI/OpenAI-compatible API keys for AI features
+### Prerequisites
 
-## Local Development Setup
+- Node.js **20.9 or newer** (required by Next.js 16)
+- npm
+- PostgreSQL
+- Optional AI provider credentials and SMTP service
 
-1. **Install dependencies**
-   ```bash
-   npm install
-   ```
-2. **Create local environment file**
-   ```bash
-   cp .env.example .env
-   ```
-3. **Set required variables** in `.env` (at minimum `DATABASE_URL` and `JWT_SECRET`).
-4. **Prepare the database**
-   ```bash
-   npx prisma migrate dev
-   ```
-   If you are iterating quickly against a non-production DB, `npx prisma db push` can also be used.
-5. **Optional seed data**
-   ```bash
-   npm run seed
-   ```
-   For release-build focused QA data:
-   ```bash
-   npm run seed:builds
-   ```
-6. **Run the app**
-   ```bash
-   npm run dev
-   ```
-7. Open `http://localhost:3000`.
+### Install and run
 
-## Environment Variables
+```bash
+git clone <repository-url>
+cd B-Board
+npm install
+cp .env.example .env
+```
 
-| Variable | Required | Description |
+Set at least `DATABASE_URL` and a strong `JWT_SECRET` in `.env`, then prepare and start the app:
+
+```bash
+npx prisma migrate dev
+npm run seed          # optional demo workspace
+npm run dev
+```
+
+Open <http://localhost:3000>. Set `HOMEPAGE_ENABLED=1` to show the marketing homepage at `/`; otherwise the root route redirects to authentication.
+
+## Configuration
+
+| Variable | Required | Purpose |
 | --- | --- | --- |
-| `DATABASE_URL` | Yes (all envs except static analysis) | PostgreSQL connection string used by Prisma. |
-| `JWT_SECRET` | Yes | Secret for signing/verifying auth tokens. Use a long random value. |
-| `APP_URL` | Yes (production) | Canonical public URL used in generated links (e.g., invites). |
-| `PORT` | No | Runtime port for `next start` (defaults to 3000). |
-| `HOMEPAGE_ENABLED` | No | `1` to expose marketing homepage at `/`; default redirects `/` to login flow. |
-| `OPENAI_API_KEY` | No | Enables standup AI drafting. |
-| `AI_API_KEY` | No | Enables backlog grooming AI suggestions via OpenAI-compatible APIs. |
-| `AI_BASE_URL` | No | Base URL override for OpenAI-compatible providers. |
-| `AI_MODEL_DEFAULT` | No | Default model for backlog grooming (defaults to `gpt-4o-mini`). |
-| `SMTP_HOST` | Recommended for email features | SMTP host for invites/contact/summary mail. |
-| `SMTP_PORT` | Recommended for email features | SMTP port (usually 587 or 465). |
-| `SMTP_USER` | Recommended for email features | SMTP username. |
-| `SMTP_PASS` | Recommended for email features | SMTP password/token. |
-| `SMTP_FROM` | Recommended for email features | Sender identity (e.g., `B Board <no-reply@yourdomain.com>`). |
-| `CONTACT_TO` | Optional | Destination inbox for contact submissions. |
+| `DATABASE_URL` | Yes | PostgreSQL connection string used by Prisma. |
+| `JWT_SECRET` | Yes | Signs and verifies authentication tokens; use a long random secret. |
+| `APP_URL` | Production | Canonical public origin used in generated links. |
+| `PORT` | No | Port used by `npm start`; defaults to `3000`. |
+| `HOMEPAGE_ENABLED` | No | Set to `1` to serve the public marketing homepage. |
+| `AI_API_KEY` | For backlog AI | Credential for backlog grooming and user-story autofill. |
+| `AI_BASE_URL` | No | Base URL for an OpenAI-compatible backlog AI provider. |
+| `AI_MODEL_DEFAULT` | No | Default backlog model; falls back to `gpt-4o-mini`. |
+| `OPENAI_API_KEY` | For standup AI | OpenAI credential for personal drafts and team summaries. |
+| `SMTP_HOST`, `SMTP_PORT` | For SMTP mail | SMTP server and port. |
+| `SMTP_USER`, `SMTP_PASS` | Usually | SMTP credentials. |
+| `SMTP_FROM` / `EMAIL_FROM` | Recommended | Sender identity. Project email settings can override it. |
+| `CONTACT_TO` | Contact form | Destination for marketing-site contact requests. |
+| `UPLOADS_DIR` | No | Filesystem location for uploaded files. |
 
-> Tip: Keep `.env` out of source control. Use your host's secret manager in production.
+Never commit real credentials. Use your deployment platform's secret manager. AI prompts can contain issue or standup content, so confirm that the chosen provider and data-retention policy meet your organization's requirements.
 
-## Database & Data Management
+### Enable backlog AI
 
-- **Schema**: `prisma/schema.prisma`
-- **Generate Prisma Client** (also runs on `postinstall`):
-  ```bash
-  npx prisma generate
-  ```
-- **Apply migrations (preferred for production)**:
-  ```bash
-  npx prisma migrate deploy
-  ```
-- **Development migration workflow**:
-  ```bash
-  npx prisma migrate dev
-  ```
-- **Seed baseline data**:
-  ```bash
-  npm run seed
-  ```
-- **Seed build-management QA data**:
-  ```bash
-  npm run seed:builds
-  ```
+1. Configure `AI_API_KEY` and, for a compatible provider, `AI_BASE_URL`.
+2. Sign in as a global admin or project Admin/PO.
+3. Open **Project → Settings → AI & Automation**.
+4. Enable **Backlog Grooming AI** and save.
+5. Open **Backlog → AI Groom backlog** or an issue's AI drafting area.
 
-## Running, Building, and Testing
+The suggestion-scope selector currently remembers a UI preference for the browser session; backend scoping is not yet implemented.
 
-- Development:
-  ```bash
-  npm run dev
-  ```
-- Production build:
-  ```bash
-  npm run build
-  ```
-- Start production server:
-  ```bash
-  npm start
-  ```
-- Run tests:
-  ```bash
-  npm test
-  ```
-- Lint:
-  ```bash
-  npm run lint
-  ```
-- Type-check:
-  ```bash
-  npm run typecheck
-  ```
+### Enable standup AI
 
-## Deployment Guide
+Set `OPENAI_API_KEY`. Contributors can use **AI Stand-up** to create editable personal drafts. Project Admins and POs can open the team summary for a date. If summary generation fails, B-Board uses the last good version or a non-LLM fallback instead of discarding the underlying submissions.
 
-### Option A: Render (recommended)
+## Commands
 
-This repo includes `render.yaml` and a deployment script (`npm run render:deploy`) designed for Render.
+| Command | Description |
+| --- | --- |
+| `npm run dev` | Start the development server. |
+| `npm run build` | Create a production build. |
+| `npm start` | Start the production server on `PORT`. |
+| `npm test` | Run the Vitest suite once. |
+| `npm run lint` | Run ESLint on TypeScript, TSX, and MJS files. |
+| `npm run typecheck` | Run TypeScript without emitting files. |
+| `npm run seed` | Load baseline seed data. |
+| `npm run seed:builds` | Load idempotent release-build QA data. |
+| `npm run dedupe:testexecutions` | Remove duplicate test executions. |
+| `npm run render:deploy` | Generate Prisma, dedupe executions, sync the schema, and build for Render. |
 
-1. Push the repository to GitHub/GitLab.
-2. Create a new **Web Service** in Render and point it to this repo.
-3. Let Render detect/use `render.yaml`.
-4. Provision a PostgreSQL database in Render.
-5. Set environment variables (`DATABASE_URL`, `JWT_SECRET`, `APP_URL`, and optional email/AI vars).
-6. Deploy. The provided deploy flow runs Prisma generate + schema sync before app build.
+## Database workflow
 
-**Production-safe recommendation:**
-- Prefer migration-based deploys (`npx prisma migrate deploy`) for long-lived environments.
-- If desired, adjust `render.yaml` / deploy script accordingly.
+```bash
+# development: create/apply a migration and regenerate the client
+npx prisma migrate dev
 
-### Option B: Any Node host (manual)
+# production: apply committed migrations
+npx prisma migrate deploy
 
-Use this path for platforms like Railway, Fly.io, DigitalOcean App Platform, EC2, or your own VM.
+# inspect data locally
+npx prisma studio
+```
 
-1. Provision PostgreSQL and collect `DATABASE_URL`.
-2. On deploy machine/container:
-   ```bash
-   npm ci
-   npm run build
-   npx prisma migrate deploy
-   npm start
-   ```
-3. Configure host environment variables:
-   - Required: `DATABASE_URL`, `JWT_SECRET`, `APP_URL`
-   - Optional: AI and SMTP variables
-4. Ensure the runtime port expected by your host maps to `PORT`.
-5. Put TLS and domain routing in front of the app (host-managed or reverse proxy).
+Use `prisma migrate deploy` for durable production environments. The supplied Render helper currently uses `prisma db push --accept-data-loss`; review that trade-off before adopting it for production data.
 
-### Option C: Docker-style deployment notes
+## Deployment
 
-If you containerize B-Board:
+### Render blueprint
 
-- Build image with Node 18+.
-- Run `npm ci`, `npm run build` during image build.
-- Run `npx prisma migrate deploy` at startup (entrypoint or release phase).
-- Pass secrets at runtime (not baked into image).
-- Expose port `3000` (or your configured `PORT`).
+1. Create a Render Blueprint from this repository.
+2. Provision the referenced PostgreSQL database (or update `render.yaml` to match an existing database).
+3. Add `APP_URL` and any AI, email, and upload configuration not declared in the blueprint.
+4. Deploy and run the validation checklist below.
 
-## Post-Deployment Validation Checklist
+### Any Node host
 
-After each deploy, validate:
+```bash
+npm ci
+npx prisma generate
+npx prisma migrate deploy
+npm run build
+npm start
+```
 
-- Authentication/login works.
-- Projects and board views load.
-- Build management pages load and can create/edit/link issues (role permitting).
-- Key reports render.
-- Email actions succeed (if SMTP configured).
-- AI actions return successful responses (if AI keys configured).
-- No Prisma migration drift errors in logs.
+Provide persistent storage or an object-storage adaptation if uploads must survive ephemeral deployments. Terminate TLS at the platform or reverse proxy and expose the configured `PORT`.
 
-For build-specific regression flow details, use `QA_CHECKLIST.md`.
+## Validation checklist
+
+Before releasing:
+
+```bash
+npm run typecheck
+npm run lint
+npm test
+npm run build
+```
+
+Then verify `/api/health`, login/registration, project access, board movement, a standup submission, key reports, and role restrictions. With integrations enabled, also run one AI draft, one grooming scan, one email action, and one upload. Use [QA_CHECKLIST.md](QA_CHECKLIST.md) for build-management regressions.
 
 ## Troubleshooting
 
-- **`PrismaClientInitializationError` / DB connection failures**
-  - Verify `DATABASE_URL`, DB firewall rules, and SSL requirements from provider.
-- **Build succeeds but app errors at runtime**
-  - Ensure environment variables are present in the runtime service (not only build stage).
-- **Invite URLs incorrect**
-  - Set `APP_URL` to the public HTTPS domain.
-- **AI features not available**
-  - Confirm `OPENAI_API_KEY` and/or `AI_*` variables are set correctly.
-- **Email not sending**
-  - Check SMTP credentials, sender policy (SPF/DKIM), and provider logs.
+| Symptom | Check |
+| --- | --- |
+| Prisma cannot connect | Validate `DATABASE_URL`, SSL parameters, firewall rules, and whether migrations were applied. |
+| Authentication resets or fails | Ensure every instance uses the same non-default `JWT_SECRET`; check HTTPS/cookie handling. |
+| Backlog AI says it is disabled | Configure `AI_API_KEY`, enable the project setting, and confirm the user is a contributor or higher. |
+| Standup AI fails | Configure `OPENAI_API_KEY`; inspect server logs and provider limits. Team summaries may display a fallback. |
+| AI provider returns invalid output | Use a JSON-capable OpenAI-compatible model and check `AI_BASE_URL`/`AI_MODEL_DEFAULT`. Responses are schema validated. |
+| Invite links point to the wrong host | Set `APP_URL` to the public HTTPS origin. |
+| Mail is not delivered | Verify SMTP credentials, sender policy, project email overrides, and SPF/DKIM. |
+| Uploaded files disappear | Point `UPLOADS_DIR` at persistent storage or use a persistent volume. |
+| Render deploy is too destructive | Replace the helper's `prisma db push --accept-data-loss` with a migration-based release step. |
 
----
+## Responsible AI notes
 
-If you are extending B-Board, start with `prisma/schema.prisma` and the `src/` routes/components for your target domain area, then update this README to keep onboarding accurate.
+- Treat generated content and recommendations as decision support, not ground truth.
+- Review drafts before applying them; B-Board deliberately keeps application actions explicit.
+- Avoid placing secrets, credentials, or unnecessary personal data in issues and standups.
+- Restrict AI settings to trusted Admin/PO users and periodically review audit history.
+- Monitor provider usage, latency, and retention policies. B-Board enforces prompt/response size limits and request timeouts for backlog AI, but provider-side controls still matter.
+
+## Documentation
+
+- [User Guide](USER_GUIDE.md) — onboarding, daily workflows, AI workflows, roles, and admin operations.
+- [Feature List](FEATURES.md) — full capability catalog, access matrix, AI guardrails, and status notes.
+- [QA Checklist](QA_CHECKLIST.md) — release-build regression scenarios.
