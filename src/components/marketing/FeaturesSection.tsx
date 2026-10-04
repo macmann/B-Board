@@ -1,62 +1,111 @@
-import { Card, CardContent, CardHeader } from "@/components/ui/Card";
-import { Button } from "@/components/ui/Button";
-
 const features = [
   {
-    title: "Backlog + Sprints",
-    description: "Plan and prioritize work across product backlog and sprints.",
+    icon: "▤",
+    title: "Backlog & epics",
+    description: "Capture, rank, filter, and refine stories, tasks, bugs, and epics in one product backlog.",
+    tags: ["Drag to rank", "AI grooming", "Jira import"],
   },
   {
-    title: "Kanban Board",
-    description: "Visualize work-in-progress and move issues across columns.",
+    icon: "↗",
+    title: "Sprint planning",
+    description: "Plan scope, track capacity, and carry work from a prioritized backlog into focused sprints.",
+    tags: ["Capacity", "Scope", "Velocity"],
   },
   {
-    title: "Standup Updates",
-    description: "Capture yesterday/today/blockers with linked issues.",
+    icon: "◫",
+    title: "Kanban execution",
+    description: "Move work through a fast, card-first board with clear ownership, priority, and status.",
+    tags: ["Drag & drop", "Quick edit", "Filters"],
   },
   {
-    title: "AI Standup Summary",
-    description: "Generate digest summaries for PO/Admin to spot risks fast.",
+    icon: "✦",
+    title: "AI standups",
+    description: "Draft daily updates, connect issues, detect blockers, and turn team input into a concise digest.",
+    tags: ["AI drafts", "Summaries", "Blockers"],
   },
   {
-    title: "Reports",
-    description: "Burndown, velocity, cycle time and team insights.",
+    icon: "◎",
+    title: "Sprint health",
+    description: "See delivery risk, capacity pressure, and proactive guidance before the sprint slips.",
+    tags: ["Health score", "Forecasting", "Guidance"],
   },
   {
-    title: "Team & Roles",
-    description: "Admin/PO/member access with project-level controls.",
+    icon: "⌁",
+    title: "Delivery reports",
+    description: "Explore burndown, velocity, cycle time, blockers, aging work, adoption, and cross-project status.",
+    tags: ["Trends", "Portfolio", "Exports"],
+  },
+  {
+    icon: "✓",
+    title: "QA Sprint 360",
+    description: "Keep test cases, executions, defects, and sprint quality signals connected to delivery work.",
+    tags: ["Test cases", "Coverage", "Defects"],
+  },
+  {
+    icon: "⬡",
+    title: "Release builds",
+    description: "Track builds by environment and status, link shipped issues, and preserve a release audit trail.",
+    tags: ["Environments", "Issue links", "Readiness"],
+  },
+  {
+    icon: "◇",
+    title: "Research backlog",
+    description: "Organize discovery work and decisions alongside the product delivery workflow.",
+    tags: ["Discovery", "Evidence", "Decisions"],
+  },
+  {
+    icon: "⚡",
+    title: "Execution alerts",
+    description: "Surface risks, blockers, and coordination nudges so the right person can act at the right time.",
+    tags: ["Nudges", "Alerts", "Owners"],
+  },
+  {
+    icon: "♙",
+    title: "Teams & permissions",
+    description: "Invite teammates and give admins, project managers, contributors, and viewers the right access.",
+    tags: ["Roles", "Invites", "Audit log"],
+  },
+  {
+    icon: "◐",
+    title: "A workspace that fits",
+    description: "Switch projects quickly, work in light or dark mode, and use keyboard-friendly controls.",
+    tags: ["Themes", "Responsive", "Fast"],
   },
 ];
 
 export function FeaturesSection() {
   return (
-    <section id="features" className="mt-16 space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div className="space-y-2">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary/80">Features</p>
-          <h2 className="text-3xl font-semibold text-slate-900 dark:text-slate-50">Built for shipping, not ceremonies.</h2>
-          <p className="max-w-3xl text-sm text-slate-600 dark:text-slate-300">
-            Keep teams aligned with one board that handles prioritization, standups, and reporting. Each card is fast by design, with familiar controls across light and dark modes.
-          </p>
-        </div>
-        <Button asChild variant="secondary" className="shadow-sm">
-          <a href="#contact">Contact us</a>
-        </Button>
+    <section id="features" className="scroll-mt-24 py-24">
+      <div className="mx-auto max-w-3xl text-center">
+        <p className="text-xs font-bold uppercase tracking-[0.24em] text-blue-600">Everything in one place</p>
+        <h2 className="mt-4 text-3xl font-bold tracking-tight text-slate-950 sm:text-5xl">
+          From the first idea to the release.
+        </h2>
+        <p className="mt-5 text-base leading-7 text-slate-600 sm:text-lg">
+          B Board connects product planning, engineering execution, QA, releases, and reporting—without stitching
+          together another stack of tools.
+        </p>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <div className="mt-14 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {features.map((feature) => (
-          <Card
+          <article
             key={feature.title}
-            className="h-full border-slate-200/80 bg-gradient-to-br from-white via-slate-50 to-slate-100/60 shadow-md transition hover:-translate-y-0.5 hover:shadow-xl dark:border-slate-800/80 dark:from-slate-900 dark:via-slate-950 dark:to-slate-900"
+            className="group rounded-3xl border border-slate-200 bg-white p-6 shadow-[0_1px_2px_rgba(15,23,42,.04)] transition duration-300 hover:-translate-y-1 hover:border-blue-200 hover:shadow-xl hover:shadow-blue-950/5"
           >
-            <CardHeader className="border-none pb-0">
-              <p className="text-sm font-semibold text-slate-900 dark:text-slate-50">{feature.title}</p>
-            </CardHeader>
-            <CardContent className="pt-3 text-sm text-slate-600 dark:text-slate-300">
-              {feature.description}
-            </CardContent>
-          </Card>
+            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-50 text-xl font-semibold text-blue-600 transition group-hover:bg-blue-600 group-hover:text-white">
+              {feature.icon}
+            </div>
+            <h3 className="mt-5 text-lg font-bold text-slate-950">{feature.title}</h3>
+            <p className="mt-2 min-h-16 text-sm leading-6 text-slate-600">{feature.description}</p>
+            <div className="mt-5 flex flex-wrap gap-2">
+              {feature.tags.map((tag) => (
+                <span key={tag} className="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-600">
+                  {tag}
+                </span>
+              ))}
+            </div>
+          </article>
         ))}
       </div>
     </section>
